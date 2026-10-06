@@ -18,7 +18,7 @@ h2{font-size:16px;margin:8px 0 12px}h3{font-size:14px;margin:0 0 7px}
 button,select,input{font:inherit}button{border:0;border-radius:10px;padding:10px 12px;background:var(--accent);color:#15120b;font-weight:700}
 .secondary{background:var(--card2);color:var(--text)}input,select{width:100%;padding:10px;border-radius:9px;border:1px solid #343b46;background:#101318;color:var(--text);margin:5px 0 9px}
 .route{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.arrow{color:var(--accent);font-weight:800}
-.bottom{position:fixed;bottom:0;left:0;right:0;background:#151920f5;border-top:1px solid #303640;display:grid;grid-template-columns:repeat(6,1fr);z-index:10}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#151920f5;border-top:1px solid #303640;display:grid;grid-template-columns:repeat(7,1fr);z-index:10}
 .nav{background:none;color:var(--muted);border-radius:0;padding:9px 2px;font-size:10px}.nav.active{color:var(--accent)}
 .small{font-size:11px;color:var(--muted)}.check{accent-color:var(--accent);transform:scale(1.15);margin-right:8px}.rule{display:block;cursor:pointer}.rule-head{display:flex;justify-content:space-between;align-items:center}.rule-detail{display:none;padding:8px 0 2px;color:var(--muted);font-size:12px;line-height:1.45}.rule.open .rule-detail{display:block}.rule.open .rule-plus{transform:rotate(45deg)}
 </style>
@@ -46,43 +46,61 @@ button,select,input{font:inherit}button{border:0;border-radius:10px;padding:10px
 </div>
 </section>
 
-<section id="islands" class="page"><h2>Island Planner</h2><div id="islandList"></div></section>
-
-<section id="market" class="page">
-<h2>East Market</h2>
-<div class="card"><h3>Live price scanner</h3>
-<div class="small">Albion Data Project East prices via the app's Cloudflare Worker. Data is crowd-sourced and can be stale.</div>
-<label class="small">Item ID</label><input id="itemId" value="T8_PUMPKIN">
-<label class="small">Quality</label>
-<select id="quality"><option value="">All</option><option value="1">Normal</option><option value="2">Good</option><option value="3">Outstanding</option><option value="4">Excellent</option><option value="5">Masterpiece</option></select>
-<button onclick="loadPrices()">Refresh East Prices</button>
-<div id="marketStatus" class="small" style="margin-top:10px"></div>
+<section id="islands" class="page">
+<h2>Island Planner</h2>
+<div class="card"><h3>Farming progression</h3>
+<div class="small">Set the highest tier you can currently farm. These settings are saved on this device.</div>
+<label class="small">Crop farming tier</label><select id="farmCropTier" onchange="saveFarmSettings()"><option value="1">T1</option><option value="2">T2</option><option value="3">T3</option><option value="4">T4</option><option value="5">T5</option><option value="6">T6</option><option value="7">T7</option><option value="8">T8</option></select>
+<label class="small">Herb farming tier</label><select id="farmHerbTier" onchange="saveFarmSettings()"><option value="1">T1</option><option value="2">T2</option><option value="3">T3</option><option value="4">T4</option><option value="5">T5</option><option value="6">T6</option><option value="7">T7</option><option value="8">T8</option></select>
+<label class="small">Animal farming tier</label><select id="farmAnimalTier" onchange="saveFarmSettings()"><option value="1">T1</option><option value="2">T2</option><option value="3">T3</option><option value="4">T4</option><option value="5">T5</option><option value="6">T6</option><option value="7">T7</option><option value="8">T8</option></select>
+<div id="farmSettingsStatus" class="small"></div>
 </div>
-<div class="card"><h3>City comparison</h3><div id="marketTable"></div></div>
-<div class="card"><h3>Best raw spread</h3><div id="arb"></div></div>
+<div id="islandList"></div>
 </section>
 
+<section id="market" class="page"><h2>East Market</h2><div class="card"><h3>Choose an item</h3><div class="small">Choose any Albion tier from T1–T8, or enter any item ID manually.</div><label class="small">Item</label><select id="marketItemPreset" onchange="setItemFromPreset('market')"><option value="">Select an item...</option><optgroup label="Weapons — T1–T8"><option value="T1_MAIN_AXE">T1 Axe</option><option value="T2_MAIN_AXE">T2 Axe</option><option value="T3_MAIN_AXE">T3 Axe</option><option value="T4_MAIN_AXE">T4 Axe</option><option value="T5_MAIN_AXE">T5 Axe</option><option value="T6_MAIN_AXE">T6 Axe</option><option value="T7_MAIN_AXE">T7 Axe</option><option value="T8_MAIN_AXE">T8 Axe</option><option value="T4_MAIN_SWORD">T4 Broadsword</option><option value="T5_MAIN_SWORD">T5 Broadsword</option><option value="T6_MAIN_SWORD">T6 Broadsword</option><option value="T7_MAIN_SWORD">T7 Broadsword</option><option value="T8_MAIN_SWORD">T8 Broadsword</option><option value="T4_MAIN_SPEAR">T4 Spear</option><option value="T5_MAIN_SPEAR">T5 Spear</option><option value="T6_MAIN_SPEAR">T6 Spear</option><option value="T7_MAIN_SPEAR">T7 Spear</option><option value="T8_MAIN_SPEAR">T8 Spear</option><option value="T4_MAIN_BOW">T4 Bow</option><option value="T5_MAIN_BOW">T5 Bow</option><option value="T6_MAIN_BOW">T6 Bow</option><option value="T7_MAIN_BOW">T7 Bow</option><option value="T8_MAIN_BOW">T8 Bow</option><option value="T4_MAIN_CROSSBOW">T4 Crossbow</option><option value="T5_MAIN_CROSSBOW">T5 Crossbow</option><option value="T6_MAIN_CROSSBOW">T6 Crossbow</option><option value="T7_MAIN_CROSSBOW">T7 Crossbow</option><option value="T8_MAIN_CROSSBOW">T8 Crossbow</option></optgroup><optgroup label="Armor & Accessories — T4–T8"><option value="T4_HEAD_PLATE_ROYAL@2">T4 Royal Plate Helmet</option><option value="T5_HEAD_PLATE_ROYAL@2">T5 Royal Plate Helmet</option><option value="T6_HEAD_PLATE_ROYAL@2">T6 Royal Plate Helmet</option><option value="T7_HEAD_PLATE_ROYAL@2">T7 Royal Plate Helmet</option><option value="T8_HEAD_PLATE_ROYAL@2">T8 Royal Plate Helmet</option><option value="T4_ARMOR_PLATE_ROYAL@2">T4 Royal Plate Armor</option><option value="T5_ARMOR_PLATE_ROYAL@2">T5 Royal Plate Armor</option><option value="T6_ARMOR_PLATE_ROYAL@2">T6 Royal Plate Armor</option><option value="T7_ARMOR_PLATE_ROYAL@2">T7 Royal Plate Armor</option><option value="T8_ARMOR_PLATE_ROYAL@2">T8 Royal Plate Armor</option></optgroup><optgroup label="Resources — T1–T8"><option value="T1_WOOD">T1 Wood</option><option value="T2_WOOD">T2 Wood</option><option value="T3_WOOD">T3 Wood</option><option value="T4_WOOD">T4 Wood</option><option value="T5_WOOD">T5 Wood</option><option value="T6_WOOD">T6 Wood</option><option value="T7_WOOD">T7 Wood</option><option value="T8_WOOD">T8 Wood</option><option value="T1_ORE">T1 Ore</option><option value="T2_ORE">T2 Ore</option><option value="T3_ORE">T3 Ore</option><option value="T4_ORE">T4 Ore</option><option value="T5_ORE">T5 Ore</option><option value="T6_ORE">T6 Ore</option><option value="T7_ORE">T7 Ore</option><option value="T8_ORE">T8 Ore</option><option value="T1_HIDE">T1 Hide</option><option value="T2_HIDE">T2 Hide</option><option value="T3_HIDE">T3 Hide</option><option value="T4_HIDE">T4 Hide</option><option value="T5_HIDE">T5 Hide</option><option value="T6_HIDE">T6 Hide</option><option value="T7_HIDE">T7 Hide</option><option value="T8_HIDE">T8 Hide</option><option value="T1_FIBER">T1 Fiber</option><option value="T2_FIBER">T2 Fiber</option><option value="T3_FIBER">T3 Fiber</option><option value="T4_FIBER">T4 Fiber</option><option value="T5_FIBER">T5 Fiber</option><option value="T6_FIBER">T6 Fiber</option><option value="T7_FIBER">T7 Fiber</option><option value="T8_FIBER">T8 Fiber</option><option value="T1_ROCK">T1 Stone</option><option value="T2_ROCK">T2 Stone</option><option value="T3_ROCK">T3 Stone</option><option value="T4_ROCK">T4 Stone</option><option value="T5_ROCK">T5 Stone</option><option value="T6_ROCK">T6 Stone</option><option value="T7_ROCK">T7 Stone</option><option value="T8_ROCK">T8 Stone</option></optgroup><optgroup label="Farming — T1–T8"><option value="T1_PUMPKIN">T1 Pumpkin</option><option value="T2_PUMPKIN">T2 Pumpkin</option><option value="T3_PUMPKIN">T3 Pumpkin</option><option value="T4_PUMPKIN">T4 Pumpkin</option><option value="T5_PUMPKIN">T5 Pumpkin</option><option value="T6_PUMPKIN">T6 Pumpkin</option><option value="T7_PUMPKIN">T7 Pumpkin</option><option value="T8_PUMPKIN">T8 Pumpkin</option><option value="T1_CORN">T1 Corn</option><option value="T2_CORN">T2 Corn</option><option value="T3_CORN">T3 Corn</option><option value="T4_CORN">T4 Corn</option><option value="T5_CORN">T5 Corn</option><option value="T6_CORN">T6 Corn</option><option value="T7_CORN">T7 Corn</option><option value="T8_CORN">T8 Corn</option><option value="T1_POTATO">T1 Potato</option><option value="T2_POTATO">T2 Potato</option><option value="T3_POTATO">T3 Potato</option><option value="T4_POTATO">T4 Potato</option><option value="T5_POTATO">T5 Potato</option><option value="T6_POTATO">T6 Potato</option><option value="T7_POTATO">T7 Potato</option><option value="T8_POTATO">T8 Potato</option><option value="T1_CABBAGE">T1 Cabbage</option><option value="T2_CABBAGE">T2 Cabbage</option><option value="T3_CABBAGE">T3 Cabbage</option><option value="T4_CABBAGE">T4 Cabbage</option><option value="T5_CABBAGE">T5 Cabbage</option><option value="T6_CABBAGE">T6 Cabbage</option><option value="T7_CABBAGE">T7 Cabbage</option><option value="T8_CABBAGE">T8 Cabbage</option></optgroup></select><label class="small">Custom Item ID</label><input id="itemId" value="T8_PUMPKIN" placeholder="Example: T4_MAIN_AXE"><label class="small">Quality</label><select id="quality"><option value="">All</option><option value="1">Normal</option><option value="2">Good</option><option value="3">Outstanding</option><option value="4">Excellent</option><option value="5">Masterpiece</option></select><button onclick="loadPrices()">Refresh East Prices</button><div id="marketStatus" class="small" style="margin-top:10px"></div></div><div class="card"><h3>City comparison</h3><div id="marketTable"></div></div><div class="card"><h3>Best raw spread</h3><div id="arb"></div></div></section>
 <section id="trades" class="page">
 <h2>City Trade Network</h2>
-<div class="card"><h3>Animal feed loop</h3><div id="feedList"></div></div>
-<div class="card"><h3>Resource refining routes</h3><div id="refineList"></div></div>
+<div class="card"><h3>Animal feed loop</h3>
+<div id="feedList"></div></div>
+<div class="card"><h3>Resource refining routes</h3>
+<div id="refineList"></div></div>
 </section>
 
 <section id="craft" class="page">
 <h2>Refining & Crafting</h2>
-<div class="card"><h3>Refining hubs</h3>
+<div class="card">
+<h3>Refining hubs</h3>
 <div class="item"><span>🪵 Wood → Planks</span><b>Fort Sterling</b></div>
 <div class="item"><span>⛏ Ore → Bars</span><b>Thetford</b></div>
 <div class="item"><span>🐗 Hide → Leather</span><b>Martlock</b></div>
 <div class="item"><span>🌿 Fiber → Cloth</span><b>Lymhurst</b></div>
 <div class="item"><span>🪨 Stone → Blocks</span><b>Bridgewatch</b></div>
 </div>
-<div class="card"><h3>Profit calculator</h3>
+<div class="card">
+<h3>Profit calculator</h3>
 <label class="small">Expected sale price</label><input id="sale" type="number" placeholder="100000">
 <label class="small">Material + refining cost</label><input id="cost" type="number" placeholder="70000">
 <label class="small">Tax / fees / transport</label><input id="fees" type="number" placeholder="10000">
-<button onclick="calc()">Calculate</button><div id="profit" style="margin-top:12px"></div>
+<button onclick="calc()">Calculate</button>
+<div id="profit" style="margin-top:12px"></div>
 </div>
+</section>
+
+<section id="blackmarket" class="page">
+<h2>Black Market Trade</h2>
+<div class="card"><h3>Find the best Royal City → Black Market route</h3>
+<div class="small">Compares the lowest current sell price in each Royal City against the Black Market's highest current buy order. Add transport or other costs for a more realistic profit.</div>
+<label class="small">Item</label>
+<select id="bmItemPreset" onchange="setItemFromPreset('bm')"><option value="">Select an item...</option><optgroup label="Weapons"><option value="T8_MAIN_AXE">T8 Axe</option><option value="T8_MAIN_SWORD">T8 Broadsword</option><option value="T8_MAIN_SPEAR">T8 Spear</option><option value="T8_MAIN_MACE">T8 Mace</option><option value="T8_MAIN_BOW">T8 Bow</option><option value="T8_MAIN_CROSSBOW">T8 Crossbow</option><option value="T8_MAIN_DAGGER">T8 Dagger</option></optgroup><optgroup label="Armor & Accessories"><option value="T8_HEAD_PLATE_ROYAL@2">T8 Royal Plate Helmet</option><option value="T8_ARMOR_PLATE_ROYAL@2">T8 Royal Plate Armor</option><option value="T8_CAPE@2">T8 Cape</option><option value="T8_BAG@2">T8 Bag</option></optgroup><optgroup label="Resources"><option value="T8_WOOD">T8 Wood</option><option value="T8_ORE">T8 Ore</option><option value="T8_HIDE">T8 Hide</option><option value="T8_FIBER">T8 Fiber</option><option value="T8_ROCK">T8 Stone</option></optgroup><optgroup label="Farming"><option value="T8_PUMPKIN">T8 Pumpkin</option><option value="T8_CORN">T8 Corn</option><option value="T8_POTATO">T8 Potato</option><option value="T8_CABBAGE">T8 Cabbage</option><option value="T8_TURNIP">T8 Turnip</option></optgroup></select>
+<label class="small">Custom Item ID</label><input id="bmItemId" value="T8_MAIN_AXE" placeholder="Example: T8_MAIN_AXE">
+<label class="small">Quality</label><select id="bmQuality"><option value="1">Normal</option><option value="2">Good</option><option value="3">Outstanding</option><option value="4">Excellent</option><option value="5">Masterpiece</option></select>
+<label class="small">Extra cost per item (transport / taxes)</label><input id="bmCost" type="number" value="0" min="0" placeholder="Example: 5000">
+<button onclick="loadBlackMarket()">Find Best Route</button>
+<div id="bmStatus" class="small" style="margin-top:10px"></div>
+</div>
+<div class="card"><h3>Best route</h3><div id="bmBest"></div></div>
+<div class="card"><h3>All Royal Cities</h3><div id="bmTable"></div></div>
 </section>
 
 <section id="check" class="page">
@@ -99,16 +117,14 @@ button,select,input{font:inherit}button{border:0;border-radius:10px;padding:10px
 <div class="card"><h3>Price notes</h3><div class="small">Use this space as a reminder: market prices change. Compare buy/sell orders, focus cost, return rate, taxes and transport before committing a production line.</div></div>
 </section>
 </main>
-
 <nav class="bottom">
 <button class="nav active" onclick="show('dashboard',this)">⌂<br>Home</button>
 <button class="nav" onclick="show('islands',this)">🌱<br>Islands</button>
-<button class="nav" onclick="show('trades',this)">↔<br>Trades</button>
-<button class="nav" onclick="show('market',this)">💰<br>Market</button>
+<button class="nav" onclick="show('trades',this)">↔<br>Trades</button><button class="nav" onclick="show('market',this)">💰<br>Market</button>
 <button class="nav" onclick="show('craft',this)">⚒<br>Craft</button>
+<button class="nav" onclick="show('blackmarket',this)">🖤<br>Black Mkt</button>
 <button class="nav" onclick="show('check',this)">✓<br>Daily</button>
 </nav>
-
 <script>
 const islands=[
 ["Lymhurst","🎃 Pumpkin","🌿 Crenellated Burdock","🪿 Goose"],
@@ -119,70 +135,34 @@ const islands=[
 ["Caerleon","🌿 Firetouched Mullein ×3","Special hub","Market / crafting"],
 ["Brecilien","🎃 Pumpkin ×3","Flex crop","+10% normal crop yield"]
 ];
-
-document.getElementById("islandList").innerHTML=islands.map(x=>`
-<div class="card"><h3>${x[0]}</h3>
-<div class="item"><span>Plot 1</span><b>${x[1]}</b></div>
-<div class="item"><span>Plot 2</span><b>${x[2]}</b></div>
-<div class="item"><span>Plot 3</span><b>${x[3]}</b></div>
-</div>`).join("");
-
-const feeds=[
-["Lymhurst","🎃 Pumpkin","Martlock","🐄 Cow"],
-["Martlock","🥔 Potato","Fort Sterling","🐑 Sheep"],
-["Fort Sterling","🥕 Turnip","Bridgewatch","🐐 Goat"],
-["Bridgewatch","🌽 Corn","Thetford","🐖 Pig"],
-["Thetford","🥬 Cabbage","Lymhurst","🪿 Goose"]
-];
-
-document.getElementById("feedList").innerHTML=feeds.map(x=>`
-<div class="item"><span>${x[0]} ${x[1]}</span><span>→</span><b>${x[2]} ${x[3]}</b></div>`).join("");
-
-const ref=[
-["🪵 Wood","Fort Sterling","Planks"],
-["⛏ Ore","Thetford","Bars"],
-["🐗 Hide","Martlock","Leather"],
-["🌿 Fiber","Lymhurst","Cloth"],
-["🪨 Stone","Bridgewatch","Blocks"]
-];
-
-document.getElementById("refineList").innerHTML=ref.map(x=>`
-<div class="item"><span>${x[0]}</span><span>→</span><b>${x[1]}: ${x[2]}</b></div>`).join("");
-
-function show(id,btn){
-document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-document.getElementById(id).classList.add("active");
-document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));
-btn.classList.add("active");
-window.scrollTo(0,0);
+document.getElementById("islandList").innerHTML=islands.map(x=>`<div class="card"><h3>${x[0]}</h3><div class="item"><span>Plot 1</span><b>${x[1]}</b></div><div class="item"><span>Plot 2</span><b>${x[2]}</b></div><div class="item"><span>Plot 3</span><b>${x[3]}</b></div></div>`).join("");
+const feeds=[["Lymhurst","🎃 Pumpkin","Martlock","🐄 Cow"],["Martlock","🥔 Potato","Fort Sterling","🐑 Sheep"],["Fort Sterling","🥕 Turnip","Bridgewatch","🐐 Goat"],["Bridgewatch","🌽 Corn","Thetford","🐖 Pig"],["Thetford","🥬 Cabbage","Lymhurst","🪿 Goose"]];
+document.getElementById("feedList").innerHTML=feeds.map(x=>`<div class="item"><span>${x[0]} ${x[1]}</span><span>→</span><b>${x[2]} ${x[3]}</b></div>`).join("");
+const ref=[["🪵 Wood","Fort Sterling","Planks"],["⛏ Ore","Thetford","Bars"],["🐗 Hide","Martlock","Leather"],["🌿 Fiber","Lymhurst","Cloth"],["🪨 Stone","Bridgewatch","Blocks"]];
+document.getElementById("refineList").innerHTML=ref.map(x=>`<div class="item"><span>${x[0]}</span><span>→</span><b>${x[1]}: ${x[2]}</b></div>`).join("");
+function show(id,btn){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));btn.classList.add("active");window.scrollTo(0,0)}
+function calc(){let s=+sale.value||0,c=+cost.value||0,f=+fees.value||0,p=s-c-f;profit.innerHTML=`<b class="${p>=0?'good':''}">${p>=0?'Profit':'Loss'}: ${p.toLocaleString()} silver</b><br><span class="small">Margin: ${s?((p/s)*100).toFixed(1):0}%</span>`}
+document.querySelectorAll(".check").forEach(x=>{x.checked=localStorage.getItem("c_"+x.dataset.k)==="1";x.onchange=()=>localStorage.setItem("c_"+x.dataset.k,x.checked?"1":"0")});
+function resetChecks(){document.querySelectorAll(".check").forEach(x=>{x.checked=false;localStorage.removeItem("c_"+x.dataset.k)})}
+function toggleRule(el){el.classList.toggle("open")}
+function saveFarmSettings(){
+const settings={crop:document.getElementById("farmCropTier").value,herb:document.getElementById("farmHerbTier").value,animal:document.getElementById("farmAnimalTier").value};
+localStorage.setItem("farmSettings",JSON.stringify(settings));
+document.getElementById("farmSettingsStatus").textContent="Saved: Crop T"+settings.crop+" • Herb T"+settings.herb+" • Animal T"+settings.animal;
 }
-
-function calc(){
-let s=+document.getElementById("sale").value||0;
-let c=+document.getElementById("cost").value||0;
-let f=+document.getElementById("fees").value||0;
-let p=s-c-f;
-document.getElementById("profit").innerHTML=
-'<b class="'+(p>=0?'good':'')+'">'+
-(p>=0?'Profit':'Loss')+': '+p.toLocaleString()+
-' silver</b><br><span class="small">Margin: '+
-(s?((p/s)*100).toFixed(1):0)+'%</span>';
+function loadFarmSettings(){
+const s=JSON.parse(localStorage.getItem("farmSettings")||'{"crop":"8","herb":"8","animal":"8"}');
+document.getElementById("farmCropTier").value=s.crop;
+document.getElementById("farmHerbTier").value=s.herb;
+document.getElementById("farmAnimalTier").value=s.animal;
+document.getElementById("farmSettingsStatus").textContent="Saved: Crop T"+s.crop+" • Herb T"+s.herb+" • Animal T"+s.animal;
 }
+loadFarmSettings()
 
-document.querySelectorAll(".check").forEach(x=>{
-x.checked=localStorage.getItem("c_"+x.dataset.k)==="1";
-x.onchange=()=>localStorage.setItem("c_"+x.dataset.k,x.checked?"1":"0");
-});
-
-function resetChecks(){
-document.querySelectorAll(".check").forEach(x=>{
-x.checked=false;
-localStorage.removeItem("c_"+x.dataset.k);
-});
-}
-
-function toggleRule(el){
-el.classList.toggle("open");
+function setItemFromPreset(type){
+const preset=document.getElementById(type==="market"?"marketItemPreset":"bmItemPreset");
+const target=document.getElementById(type==="market"?"itemId":"bmItemId");
+if(preset.value)target.value=preset.value;
 }
 
 const EAST_API="/api/prices";
@@ -192,88 +172,79 @@ async function loadPrices(){
 const id=document.getElementById("itemId").value.trim();
 const q=document.getElementById("quality").value;
 if(!id)return;
-
 const st=document.getElementById("marketStatus");
 const tb=document.getElementById("marketTable");
 const ar=document.getElementById("arb");
-
 st.textContent="Loading East market data...";
-
 try{
-const p=new URLSearchParams({
-item:id,
-locations:CITIES.join(",")
-});
-
+const p=new URLSearchParams({item:id,locations:CITIES.join(",")});
 if(q)p.set("qualities",q);
-
 const r=await fetch(EAST_API+"?"+p.toString(),{cache:"no-store"});
-
 if(!r.ok)throw Error("HTTP "+r.status);
-
 const d=await r.json();
-
 const rows=CITIES.map(c=>{
 const a=d.filter(x=>x.city===c||x.location===c);
-
-const ss=a.filter(x=>x.sell_price_min>0)
-.sort((x,y)=>x.sell_price_min-y.sell_price_min)[0];
-
-const bb=a.filter(x=>x.buy_price_max>0)
-.sort((x,y)=>y.buy_price_max-x.buy_price_max)[0];
-
-return{
-city:c,
-sell:ss?.sell_price_min||0,
-buy:bb?.buy_price_max||0,
-ts:ss?.sell_price_min_date||bb?.buy_price_max_date
-};
+const ss=a.filter(x=>x.sell_price_min>0).sort((x,y)=>x.sell_price_min-y.sell_price_min)[0];
+const bb=a.filter(x=>x.buy_price_max>0).sort((x,y)=>y.buy_price_max-x.buy_price_max)[0];
+return{city:c,sell:ss?.sell_price_min||0,buy:bb?.buy_price_max||0,ts:ss?.sell_price_min_date||bb?.buy_price_max_date};
 });
-
-tb.innerHTML=
-'<div class="item"><b>City</b><b>Sell / Buy</b></div>'+
-rows.map(x=>
-'<div class="item"><span>'+x.city+
-'</span><span><b>'+fmt(x.sell)+
-'</b> / <b>'+fmt(x.buy)+
-'</b><br><small>'+age(x.ts)+
-'</small></span></div>'
-).join("");
-
-const sell=rows.filter(x=>x.sell)
-.sort((a,b)=>a.sell-b.sell)[0];
-
-const buy=rows.filter(x=>x.buy)
-.sort((a,b)=>b.buy-a.buy)[0];
-
+tb.innerHTML='<div class="item"><b>City</b><b>Sell / Buy</b></div>'+
+rows.map(x=>'<div class="item"><span>'+x.city+'</span><span><b>'+fmt(x.sell)+'</b> / <b>'+fmt(x.buy)+'</b><br><small>'+age(x.ts)+'</small></span></div>').join("");
+const sell=rows.filter(x=>x.sell).sort((a,b)=>a.sell-b.sell)[0];
+const buy=rows.filter(x=>x.buy).sort((a,b)=>b.buy-a.buy)[0];
 ar.innerHTML=sell&&buy&&buy.buy>sell.sell?
-'<b class="good">'+fmt(buy.buy-sell.sell)+
-' silver raw spread/item</b>'+
-'<div class="item"><span>Buy at '+sell.city+
-'</span><b>'+fmt(sell.sell)+
-'</b></div>'+
-'<div class="item"><span>Sell to orders at '+buy.city+
-'</span><b>'+fmt(buy.buy)+
-'</b></div>'+
+'<b class="good">'+fmt(buy.buy-sell.sell)+' silver raw spread/item</b>'+
+'<div class="item"><span>Buy at '+sell.city+'</span><b>'+fmt(sell.sell)+'</b></div>'+
+'<div class="item"><span>Sell to orders at '+buy.city+'</span><b>'+fmt(buy.buy)+'</b></div>'+
 '<div class="small">Before tax, transport, quantity and stale-data risk.</div>':
 '<span class="small">No positive raw spread found.</span>';
-
 st.textContent='Updated '+new Date().toLocaleTimeString();
-
 }catch(e){
 st.textContent='Could not load prices: '+e.message;
 }
 }
 
-function fmt(n){
-return n?Number(n).toLocaleString():'—';
-}
+function fmt(n){return n?Number(n).toLocaleString():'—'}
+function age(t){if(!t)return'No timestamp';const d=new Date(t);return isNaN(d)?'Timestamp unavailable':'Updated '+d.toLocaleString()}
 
-function age(t){
-if(!t)return'No timestamp';
-const d=new Date(t);
-return isNaN(d)?'Timestamp unavailable':'Updated '+d.toLocaleString();
+const ROYAL_CITIES=["Lymhurst","Bridgewatch","Martlock","Thetford","Fort Sterling","Caerleon"];
+
+async function loadBlackMarket(){
+const id=document.getElementById("bmItemId").value.trim();
+const q=document.getElementById("bmQuality").value;
+const extra=Number(document.getElementById("bmCost").value)||0;
+const st=document.getElementById("bmStatus");
+const best=document.getElementById("bmBest");
+const table=document.getElementById("bmTable");
+if(!id)return;
+st.textContent="Checking Royal City prices and Black Market...";
+best.innerHTML="";
+table.innerHTML="";
+try{
+const p=new URLSearchParams({item:id,locations:ROYAL_CITIES.concat(["Black Market"]).join(","),qualities:q});
+const r=await fetch(EAST_API+"?"+p.toString(),{cache:"no-store"});
+if(!r.ok)throw Error("HTTP "+r.status);
+const d=await r.json();
+const bm=d.filter(x=>(x.city||x.location)==="Black Market"&&x.buy_price_max>0).sort((a,b)=>b.buy_price_max-a.buy_price_max)[0];
+if(!bm)throw Error("No Black Market buy order found for this item/quality");
+const rows=ROYAL_CITIES.map(city=>{
+const a=d.filter(x=>(x.city||x.location)===city&&x.sell_price_min>0).sort((x,y)=>x.sell_price_min-y.sell_price_min)[0];
+if(!a)return{city,buy:0,profit:0,margin:0,ts:null};
+const profit=bm.buy_price_max-a.sell_price_min-extra;
+return{city,buy:a.sell_price_min,profit,margin:a.sell_price_min?profit/a.sell_price_min*100:0,ts:a.sell_price_min_date};
+}).filter(x=>x.buy>0).sort((a,b)=>b.profit-a.profit);
+const profitable=rows.filter(x=>x.profit>0);
+if(profitable.length){
+const x=profitable[0];
+best.innerHTML='<div class="stat good">+'+fmt(x.profit)+' silver / item</div><div class="item"><span>Buy in</span><b>'+x.city+'</b></div><div class="item"><span>Royal City price</span><b>'+fmt(x.buy)+'</b></div><div class="item"><span>Black Market buy order</span><b>'+fmt(bm.buy_price_max)+'</b></div><div class="item"><span>Extra costs</span><b>'+fmt(extra)+'</b></div><div class="item"><span>Profit margin</span><b>'+x.margin.toFixed(1)+'%</b></div><div class="small">BM order: '+age(bm.buy_price_max_date)+'. Royal price: '+age(x.ts)+'.</div>';
+}else{
+best.innerHTML='<span class="bad">No profitable Royal City route found after extra costs.</span><div class="small">Try a different item, quality, or lower transport cost.</div>';
+}
+table.innerHTML='<div class="item"><b>City</b><b>Buy → BM Profit</b></div>'+rows.map(x=>'<div class="item"><span>'+x.city+'</span><span>'+fmt(x.buy)+' → <b class="'+(x.profit>0?'good':'bad')+'">'+(x.profit>0?'+':'')+fmt(x.profit)+'</b><br><small>'+x.margin.toFixed(1)+'% margin</small></span></div>').join("");
+st.textContent="Black Market checked "+new Date().toLocaleTimeString();
+}catch(e){
+st.textContent="Could not load Black Market data: "+e.message;
+}
 }
 </script>
-</body>
-</html>
+</body></html>
