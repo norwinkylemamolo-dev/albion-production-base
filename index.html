@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101318">
+<title>Albion Production Base</title>
+<style>
+:root{--bg:#0d1015;--card:#171b22;--card2:#202630;--text:#f2f3f5;--muted:#9ca5b1;--accent:#d6a84f;--good:#6fd08c;--bad:#e47777}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,sans-serif;padding-bottom:78px}
+header{position:sticky;top:0;z-index:5;background:#101318ee;backdrop-filter:blur(10px);padding:14px 16px;border-bottom:1px solid #2a3039}
+h1{font-size:20px;margin:0}.sub{color:var(--muted);font-size:12px;margin-top:3px}
+main{padding:14px;max-width:700px;margin:auto}.page{display:none}.page.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.card{background:var(--card);border:1px solid #292f38;border-radius:14px;padding:13px;margin-bottom:10px}.stat{font-size:23px;font-weight:750}.label{font-size:12px;color:var(--muted)}
+h2{font-size:16px;margin:8px 0 12px}h3{font-size:14px;margin:0 0 7px}
+.item{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #2a3038;font-size:13px}.item:last-child{border-bottom:0}
+.tag{display:inline-block;padding:3px 7px;border-radius:999px;background:#292f38;color:#ddd;font-size:11px}.good{color:var(--good)}.accent{color:var(--accent)}
+button,select,input{font:inherit}button{border:0;border-radius:10px;padding:10px 12px;background:var(--accent);color:#15120b;font-weight:700}
+.secondary{background:var(--card2);color:var(--text)}input,select{width:100%;padding:10px;border-radius:9px;border:1px solid #343b46;background:#101318;color:var(--text);margin:5px 0 9px}
+.route{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.arrow{color:var(--accent);font-weight:800}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#151920f5;border-top:1px solid #303640;display:grid;grid-template-columns:repeat(6,1fr);z-index:10}
+.nav{background:none;color:var(--muted);border-radius:0;padding:9px 2px;font-size:10px}.nav.active{color:var(--accent)}
+.small{font-size:11px;color:var(--muted)}.check{accent-color:var(--accent);transform:scale(1.15);margin-right:8px}
+</style>
+</head>
+<body>
+<header><h1>⚔ Albion Production Base</h1><div class="sub">East server • live market • farming • refining • crafting</div></header>
+<main>
+<section id="dashboard" class="page active">
+<h2>Production Dashboard</h2>
+<div class="grid">
+<div class="card"><div class="label">Islands</div><div class="stat">7</div></div>
+<div class="card"><div class="label">Royal feed loop</div><div class="stat">5 cities</div></div>
+<div class="card"><div class="label">Refining hubs</div><div class="stat">5</div></div>
+<div class="card"><div class="label">Special hubs</div><div class="stat">2</div></div>
+</div>
+<div class="card"><h3>Today’s production route</h3>
+<div class="route"><span class="tag">Lymhurst</span><span class="arrow">→</span><span class="tag">Martlock</span><span class="arrow">→</span><span class="tag">Fort Sterling</span><span class="arrow">→</span><span class="tag">Bridgewatch</span><span class="arrow">→</span><span class="tag">Thetford</span><span class="arrow">→</span><span class="tag">Lymhurst</span></div>
+<p class="small">Feed loop: Pumpkin → Cow, Potato → Sheep, Turnip → Goat, Corn → Pig, Cabbage → Goose.</p>
+</div>
+<div class="card"><h3>Quick rules</h3>
+<div class="item"><span>🌱 Farm where yield bonus is useful</span><span class="good">+</span></div>
+<div class="item"><span>🔨 Refine in resource-bonus city</span><span class="good">+</span></div>
+<div class="item"><span>⚒ Craft in item-bonus city</span><span class="good">+</span></div>
+<div class="item"><span>💰 Sell where margin survives tax + transport</span><span class="good">+</span></div>
+</div>
+</section>
+
+<section id="islands" class="page">
+<h2>Island Planner</h2>
+<div id="islandList"></div>
+</section>
+
+<section id="market" class="page"><h2>East Market</h2><div class="card"><h3>Live price scanner</h3><div class="small">Albion Data Project East prices via the app's Cloudflare Worker. Data is crowd-sourced and can be stale.</div><label class="small">Item ID</label><input id="itemId" value="T8_PUMPKIN"><label class="small">Quality</label><select id="quality"><option value="">All</option><option value="1">Normal</option><option value="2">Good</option><option value="3">Outstanding</option><option value="4">Excellent</option><option value="5">Masterpiece</option></select><button onclick="loadPrices()">Refresh East Prices</button><div id="marketStatus" class="small" style="margin-top:10px"></div></div><div class="card"><h3>City comparison</h3><div id="marketTable"></div></div><div class="card"><h3>Best raw spread</h3><div id="arb"></div></div></section>
+<section id="trades" class="page">
+<h2>City Trade Network</h2>
+<div class="card"><h3>Animal feed loop</h3>
+<div id="feedList"></div></div>
+<div class="card"><h3>Resource refining routes</h3>
+<div id="refineList"></div></div>
+</section>
+
+<section id="craft" class="page">
+<h2>Refining & Crafting</h2>
+<div class="card">
+<h3>Refining hubs</h3>
+<div class="item"><span>🪵 Wood → Planks</span><b>Fort Sterling</b></div>
+<div class="item"><span>⛏ Ore → Bars</span><b>Thetford</b></div>
+<div class="item"><span>🐗 Hide → Leather</span><b>Martlock</b></div>
+<div class="item"><span>🌿 Fiber → Cloth</span><b>Lymhurst</b></div>
+<div class="item"><span>🪨 Stone → Blocks</span><b>Bridgewatch</b></div>
+</div>
+<div class="card">
+<h3>Profit calculator</h3>
+<label class="small">Expected sale price</label><input id="sale" type="number" placeholder="100000">
+<label class="small">Material + refining cost</label><input id="cost" type="number" placeholder="70000">
+<label class="small">Tax / fees / transport</label><input id="fees" type="number" placeholder="10000">
+<button onclick="calc()">Calculate</button>
+<div id="profit" style="margin-top:12px"></div>
+</div>
+</section>
+
+<section id="check" class="page">
+<h2>Collection Checklist</h2>
+<div class="card">
+<label><input class="check" type="checkbox" data-k="farm">Harvest all island farms</label>
+<label><input class="check" type="checkbox" data-k="animals">Collect animal products</label>
+<label><input class="check" type="checkbox" data-k="feed">Reserve next animal-feed cycle</label>
+<label><input class="check" type="checkbox" data-k="refine">Move resources to refining hubs</label>
+<label><input class="check" type="checkbox" data-k="craft">Craft only profitable items</label>
+<label><input class="check" type="checkbox" data-k="sell">Check destination market before selling</label>
+<button class="secondary" onclick="resetChecks()">Reset checklist</button>
+</div>
+<div class="card"><h3>Price notes</h3><div class="small">Use this space as a reminder: market prices change. Compare buy/sell orders, focus cost, return rate, taxes and transport before committing a production line.</div></div>
+</section>
+</main>
+<nav class="bottom">
+<button class="nav active" onclick="show('dashboard',this)">⌂<br>Home</button>
+<button class="nav" onclick="show('islands',this)">🌱<br>Islands</button>
+<button class="nav" onclick="show('trades',this)">↔<br>Trades</button><button class="nav" onclick="show('market',this)">💰<br>Market</button>
+<button class="nav" onclick="show('craft',this)">⚒<br>Craft</button>
+<button class="nav" onclick="show('check',this)">✓<br>Daily</button>
+</nav>
+<script>
+const islands=[
+["Lymhurst","🎃 Pumpkin","🌿 Crenellated Burdock","🪿 Goose"],
+["Bridgewatch","🌽 Corn","🌿 Dragon Teasel","🐐 Goat"],
+["Martlock","🥔 Potato","🌿 Elusive Foxglove","🐄 Cow"],
+["Thetford","🥬 Cabbage","🌿 Firetouched Mullein","🐖 Pig"],
+["Fort Sterling","🥕 Turnip","🌿 Ghoul Yarrow","🐑 Sheep"],
+["Caerleon","🌿 Firetouched Mullein ×3","Special hub","Market / crafting"],
+["Brecilien","🎃 Pumpkin ×3","Flex crop","+10% normal crop yield"]
+];
+document.getElementById("islandList").innerHTML=islands.map(x=>`<div class="card"><h3>${x[0]}</h3><div class="item"><span>Plot 1</span><b>${x[1]}</b></div><div class="item"><span>Plot 2</span><b>${x[2]}</b></div><div class="item"><span>Plot 3</span><b>${x[3]}</b></div></div>`).join("");
+const feeds=[["Lymhurst","🎃 Pumpkin","Martlock","🐄 Cow"],["Martlock","🥔 Potato","Fort Sterling","🐑 Sheep"],["Fort Sterling","🥕 Turnip","Bridgewatch","🐐 Goat"],["Bridgewatch","🌽 Corn","Thetford","🐖 Pig"],["Thetford","🥬 Cabbage","Lymhurst","🪿 Goose"]];
+document.getElementById("feedList").innerHTML=feeds.map(x=>`<div class="item"><span>${x[0]} ${x[1]}</span><span>→</span><b>${x[2]} ${x[3]}</b></div>`).join("");
+const ref=[["🪵 Wood","Fort Sterling","Planks"],["⛏ Ore","Thetford","Bars"],["🐗 Hide","Martlock","Leather"],["🌿 Fiber","Lymhurst","Cloth"],["🪨 Stone","Bridgewatch","Blocks"]];
+document.getElementById("refineList").innerHTML=ref.map(x=>`<div class="item"><span>${x[0]}</span><span>→</span><b>${x[1]}: ${x[2]}</b></div>`).join("");
+function show(id,btn){document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));btn.classList.add("active");window.scrollTo(0,0)}
+function calc(){let s=+sale.value||0,c=+cost.value||0,f=+fees.value||0,p=s-c-f;profit.innerHTML=`<b class="${p>=0?'good':''}">${p>=0?'Profit':'Loss'}: ${p.toLocaleString()} silver</b><br><span class="small">Margin: ${s?((p/s)*100).toFixed(1):0}%</span>`}
+document.querySelectorAll(".check").forEach(x=>{x.checked=localStorage.getItem("c_"+x.dataset.k)==="1";x.onchange=()=>localStorage.setItem("c_"+x.dataset.k,x.checked?"1":"0")});
+function resetChecks(){document.querySelectorAll(".check").forEach(x=>{x.checked=false;localStorage.removeItem("c_"+x.dataset.k)})}
+
+const EAST_API="/api/prices";const CITIES=["Lymhurst","Bridgewatch","Martlock","Thetford","Fort Sterling","Caerleon","Brecilien"];
+async function loadPrices(){const id=document.getElementById("itemId").value.trim(),q=document.getElementById("quality").value;if(!id)return;const st=document.getElementById("marketStatus"),tb=document.getElementById("marketTable"),ar=document.getElementById("arb");st.textContent="Loading East market data...";try{const p=new URLSearchParams({item:id,locations:CITIES.join(",")});if(q)p.set("qualities",q);const r=await fetch(EAST_API+"?"+p.toString(),{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const d=await r.json();const rows=CITIES.map(c=>{const a=d.filter(x=>x.city===c||x.location===c),ss=a.filter(x=>x.sell_price_min>0).sort((x,y)=>x.sell_price_min-y.sell_price_min)[0],bb=a.filter(x=>x.buy_price_max>0).sort((x,y)=>y.buy_price_max-x.buy_price_max)[0];return{city:c,sell:ss?.sell_price_min||0,buy:bb?.buy_price_max||0,ts:ss?.sell_price_min_date||bb?.buy_price_max_date}});tb.innerHTML='<div class="item"><b>City</b><b>Sell / Buy</b></div>'+rows.map(x=>`<div class="item"><span>${x.city}</span><span><b>${fmt(x.sell)}</b> / <b>${fmt(x.buy)}</b><br><small>${age(x.ts)}</small></span></div>`).join("");const sell=rows.filter(x=>x.sell).sort((a,b)=>a.sell-b.sell)[0],buy=rows.filter(x=>x.buy).sort((a,b)=>b.buy-a.buy)[0];ar.innerHTML=sell&&buy&&buy.buy>sell.sell?`<b class="good">${fmt(buy.buy-sell.sell)} silver raw spread/item</b><div class="item"><span>Buy at ${sell.city}</span><b>${fmt(sell.sell)}</b></div><div class="item"><span>Sell to orders at ${buy.city}</span><b>${fmt(buy.buy)}</b></div><div class="small">Before tax, transport, quantity and stale-data risk.</div>`:'<span class="small">No positive raw spread found.</span>';st.textContent='Updated '+new Date().toLocaleTimeString()}catch(e){st.textContent='Could not load prices: '+e.message}}function fmt(n){return n?Number(n).toLocaleString():'—'}function age(t){if(!t)return'No timestamp';const d=new Date(t);return isNaN(d)?'Timestamp unavailable':'Updated '+d.toLocaleString()}
+</script>
+</body></html>
